@@ -1,3 +1,4 @@
+#version 450
 // Reference: https://www.shadertoy.com/view/4ds3zs
 #ifdef GL_ES
 precision mediump float;
@@ -5,7 +6,7 @@ precision mediump float;
 
 uniform float iGlobalTime;
 uniform vec3 iResolution;
-varying vec2 fragCoord;
+in vec2 fragCoord;
 
 float iSphere(vec3 ro, vec3 rd, vec4 sph) {
     // a sphere centered at the origin has equation |xyz| = r
@@ -42,8 +43,7 @@ vec3 nPlane(vec3 pos) {// normal of plane
 }
 
 vec4 sph1 = vec4(0.0, 1.0, 0.0, 1.0);//sphere center
-float resT;
-float intersect(vec3 ro, vec3 rd) {
+float intersect(vec3 ro, vec3 rd, out float resT) {
     resT = 1000.0;
     float id = -1.0;
     float tsph = iSphere(ro, rd, sph1);// intersect with a sphere
@@ -61,7 +61,7 @@ float intersect(vec3 ro, vec3 rd) {
     return id;
 }
 
-void kore() {
+void main() {
     //light direction
     vec3 lightDir = normalize(vec3(0.57, 0.57, 0.57));
     
@@ -79,8 +79,8 @@ void kore() {
     //vec2(1.78, 1.0) adjust ratio of length and width
     vec3 rd = normalize(vec3( (-1.0 +2.0*uv) *vec2(aspect_ratio, 1.0), -1.0));
     //we intersect the ray with the 3d scene
-    float id = intersect (ro, rd);
-    float t = resT;
+    float t;
+    float id = intersect(ro, rd, t);
 
     //we need to do some lighting
     //and for that we need normals
